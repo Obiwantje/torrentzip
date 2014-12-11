@@ -334,6 +334,7 @@ func writeCentralHeader(w io.Writer, h *czip.File, canonicalName string, offset 
 		eb.uint16(zip64ExtraId)
 		eb.uint16(16) // size = 3x uint64
 		eb.uint64(h.UncompressedSize64)
+		eb.uint64(h.CompressedSize64)
 		h.Extra = append(h.Extra, buf[:]...)
 	} else {
 		b.uint32(h.CompressedSize)
