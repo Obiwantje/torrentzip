@@ -48,7 +48,7 @@ import (
 )
 
 const (
-	versionStr = "1.0"
+	versionStr = "1.1"
 )
 
 func usage() {
