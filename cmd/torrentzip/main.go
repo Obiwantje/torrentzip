@@ -38,7 +38,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/cheggaaa/pb"
-	"github.com/uwedeportivo/torrentzip"
+	"github.com/Obiwantje/torrentzip"
 	"io"
 	"io/ioutil"
 	"os"
