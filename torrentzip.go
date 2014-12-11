@@ -225,8 +225,6 @@ func (w *Writer) Close() error {
 
 		// store max values in the regular end record to signal that
 		// that the zip64 values should be used instead
-		records = uint16max
-		size = uint32max
 		offset = uint32max
 	}
 
