@@ -347,7 +347,7 @@ func writeCentralHeader(w io.Writer, h *czip.File, canonicalName string, offset 
 	b.uint16(0)
 	b.uint32(0)
 	if isZip64(h) || offset > uint32max {
-		b.uint32(uint32max)
+		b.uint32(0)
 	} else {
 		b.uint32(uint32(offset))
 	}
