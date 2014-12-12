@@ -288,7 +288,7 @@ func writeHeader(w io.Writer, h *czip.File, canonicalName string) error {
 		 if h.CompressedSize < uint32max {
 			 b.uint32(h.CompressedSize)
 		 } else {
-			b.unt32(uint32max)
+			b.uint32(uint32max)
 		}
 		b.uint32(uint32max) // uncompressed size
 
