@@ -335,9 +335,13 @@ func writeCentralHeader(w io.Writer, h *czip.File, canonicalName string, offset 
 		// the file needs a zip64 header. store maxint in both
 		// 32 bit size fields (and offset later) to signal that the
 		// zip64 extra header should be used.
-		b.uint32(uint32max) // compressed size
-		b.uint32(uint32max) // uncompressed size
-
+		if h.CompressedSize < uint32max {
+			 b.uint32(h.CompressedSize)
+		} else {
+			b.uint32(uint32max)
+		}
+		b.uint32(uint32max) // uncompressed size		
+		
 		// append a zip64 extra block to Extra
 		var buf [20]byte
 		eb := writeBuf(buf[:])
