@@ -24,7 +24,7 @@ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+(INCLUDING NEGLIGENCE OimR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
@@ -225,7 +225,15 @@ func (w *Writer) Close() error {
 
 		// store max values in the regular end record to signal that
 		// that the zip64 values should be used instead
-		offset = uint32max
+		if records > uint16max {
+			records = uint16max
+		}
+		if size > uint32max {
+			size = uint32max
+		}
+		if offset > uint32max {
+			offset = uint32max
+		}
 	}
 
 	var buf [directoryEndLen]byte
@@ -327,13 +335,23 @@ func writeCentralHeader(w io.Writer, h *czip.File, canonicalName string, offset 
 		b.uint32(uint32max) // uncompressed size
 
 		// append a zip64 extra block to Extra
-		var buf [20]byte // 2x uint16 + 3x uint64
+		var buf [20]byte
 		eb := writeBuf(buf[:])
 		eb.uint16(zip64ExtraId)
-		eb.uint16(16) // size = 3x uint64
+		if offset > uint32max {
+			eb.uint16(24)
+		} else {
+			eb.uint16(16)
+		}
 		eb.uint64(h.UncompressedSize64)
 		eb.uint64(h.CompressedSize64)
 		h.Extra = append(h.Extra, buf[:]...)
+		if offset > uint32max {
+			var obuf [8]byte
+			ob := writeBuf(obuf[:])
+			ob.uint64(uint64(offset))
+			h.Extra = append(h.Extra, obuf[:]...)
+		}
 	} else {
 		b.uint32(h.CompressedSize)
 		b.uint32(h.UncompressedSize)
@@ -344,8 +362,8 @@ func writeCentralHeader(w io.Writer, h *czip.File, canonicalName string, offset 
 	b.uint16(0)
 	b.uint16(0)
 	b.uint32(0)
-	if isZip64(h) || offset > uint32max {
-		b.uint32(0)
+	if offset > uint32max {
+		b.uint32(uint32max)
 	} else {
 		b.uint32(uint32(offset))
 	}
