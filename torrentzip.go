@@ -285,7 +285,11 @@ func writeHeader(w io.Writer, h *czip.File, canonicalName string) error {
 		// the file needs a zip64 header. store maxint in both
 		// 32 bit size fields to signal that the
 		// zip64 extra header should be used.
-		b.uint32(uint32max) // compressed size
+		 if h.CompressedSize < uint32max {
+			 b.uint32(h.CompressedSize)
+		 } else {
+			b.unt32(uint32max)
+		}
 		b.uint32(uint32max) // uncompressed size
 
 		// append a zip64 extra block to Extra
